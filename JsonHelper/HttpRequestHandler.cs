@@ -26,14 +26,15 @@ namespace JsonHelper
             this.delayRequests = delayRequests;
         }
 
-        public async Task<T> GetRequestAsync<T>(string url, Action retryAction)
+        public async Task<T> GetRequestAsync<T>(string url, Action retryAction = null)
         {
             var retryPolicy = Policy
                 .Handle<HttpRequestException>()
                 .Or<TaskCanceledException>() 
                 .WaitAndRetryAsync(3, retryAttempt =>
                 {
-                    retryAction(); 
+                    if (retryAction is not null)
+                        retryAction(); 
                     return TimeSpan.FromMilliseconds(DelayErrors); 
                 },
                 (exception, timeSpan, context) =>
@@ -49,7 +50,7 @@ namespace JsonHelper
                 var response = await sharedHttpClient.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
                 {
-                    //Console.WriteLine($"Failed to retrieve match data for {matchId}. HTTP Status: {response.StatusCode}");
+                    //Console.WriteLine($"Failed to retrieve match data for {url}. HTTP Status: {response.StatusCode}");
                     //TODO: Логирование?
                     return default;
                 }
@@ -58,8 +59,7 @@ namespace JsonHelper
 
                 return deserializeResponse;
             });
-
-            return default;
+            return response2;
         }
     }
 }

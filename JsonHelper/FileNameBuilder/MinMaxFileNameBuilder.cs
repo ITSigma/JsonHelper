@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace JsonHelper
 {
-    internal class MinMaxFileNameBuilder<T> : FileNameBuilderBase<IEnumerable<T>>
+    internal class MinMaxFileNameBuilder<T> : IFileNameBuilder<IEnumerable<T>>
     {
         private string nameTClass { get => typeof(T).Name; }
 
-        public override string BuildName(string directoryPath, IEnumerable<T> values, string fileExtension)
-            => BuildNameDefault(directoryPath, $"{nameTClass}_{values.Min()}-{values.Max()}",
-                fileExtension);
+        public string BuildName(IEnumerable<T> values, string fileExtension)
+            => $"{nameTClass}_{values.Min()}-{values.Max()}.{fileExtension}";
     }
 }

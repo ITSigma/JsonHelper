@@ -2,7 +2,7 @@
 
 namespace JsonHelper
 {
-    internal abstract class FileSaverBase<T> 
+    internal static class FileSaverBase<T> 
     {
         //public string DirectoryPath { get; }
         private const int BufferSize = 8192; //TODO: одно упоминание 
@@ -18,16 +18,16 @@ namespace JsonHelper
         //}
 
         //public async Task SaveToFileAsync(T valueToSave)
-        public async Task SaveToFileAsync(T valueToSave, string directoryPath,
+        public static async Task SaveToFileAsync(T valueToSave, string directoryPath,
             string fileName)
         {
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
 
-            var filePath = $"directoryPath/fileName.json";
+            var filePath = $"{directoryPath}\\{fileName}";
 
-            if (File.Exists(filePath))
-                valueToSave = await GetJoinedValues(valueToSave, filePath);
+            //if (File.Exists(filePath)) 
+            //    valueToSave = await GetJoinedValues(valueToSave, filePath);
 
             using (var stream = new FileStream(filePath, FileMode.OpenOrCreate,
                 FileAccess.Write, FileShare.None, bufferSize: BufferSize, useAsync: true))
@@ -41,13 +41,13 @@ namespace JsonHelper
             }
         }
 
-        protected abstract T JoinExistingAndNewValues(T existingValue, T valueToSave);
+        //protected abstract T JoinExistingAndNewValues(T existingValue, T valueToSave);
 
-        private async Task<T> GetJoinedValues(T valueToSave, string filePath)
-        {
-            T? existingValue = await FileReader<T>.ReadFromFileAsync(filePath, true);
-            valueToSave = JoinExistingAndNewValues(existingValue, valueToSave);
-            return valueToSave;
-        }
+        //private async Task<T> GetJoinedValues(T valueToSave, string filePath)
+        //{
+        //    T? existingValue = await FileReader<T>.ReadFromFileAsync(filePath, true);
+        //    valueToSave = JoinExistingAndNewValues(existingValue, valueToSave);
+        //    return valueToSave;
+        //}
     }
 }
