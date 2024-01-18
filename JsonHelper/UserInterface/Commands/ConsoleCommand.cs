@@ -1,4 +1,4 @@
-﻿namespace JsonHelper
+﻿namespace JsonHelper.UserInterface
 {
     public abstract class ConsoleCommand
     {

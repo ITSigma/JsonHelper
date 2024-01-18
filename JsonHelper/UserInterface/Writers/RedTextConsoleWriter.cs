@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace JsonHelper
+namespace JsonHelper.UserInterface
 {
     public class RedTextConsoleWriter : TextWriter
     {

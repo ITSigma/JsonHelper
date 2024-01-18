@@ -1,17 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-
-namespace JsonHelper
+﻿namespace JsonHelper.UserInterface
 {
     public class CommandsExecutor : ICommandsExecutor
     {
         private TextWriter writer;
         private readonly ConsoleCommand[] commands;
 
-        //Атрибут [Named("error")]добавляет зависимость от Ninject контейнера, 
-        //поэтому используйте его, если это не критично для вас.
-        public CommandsExecutor(ConsoleCommand[] commands, /*[Named("error")]*/TextWriter writer)
+        public CommandsExecutor(ConsoleCommand[] commands, TextWriter writer)
         {
             this.commands = commands;
             this.writer = writer;
@@ -24,7 +18,9 @@ namespace JsonHelper
         
         public ConsoleCommand FindCommandByName(string name)
         {
-            return commands.FirstOrDefault(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+            return commands
+                .FirstOrDefault(c => string
+                .Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
         public void Execute(string[] args)

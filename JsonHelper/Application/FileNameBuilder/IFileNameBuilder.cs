@@ -1,4 +1,4 @@
-﻿namespace JsonHelper
+﻿namespace JsonHelper.Application
 {
     internal interface IFileNameBuilder<T>
     {

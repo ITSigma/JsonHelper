@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Polly;
 
-namespace JsonHelper
+namespace JsonHelper.Infrastructure
 {
     internal class HttpRequestHandler
     {
         private const int DelayHttpClient = 10000;
         private const int DelayErrors = 2000;
-        private int delayRequests { get; set; }
+        private int delayRequests { get; }
         private static readonly HttpClient sharedHttpClient;
 
         static HttpRequestHandler()
@@ -30,30 +27,22 @@ namespace JsonHelper
         {
             var retryPolicy = Policy
                 .Handle<HttpRequestException>()
-                .Or<TaskCanceledException>() 
+                .Or<TaskCanceledException>()
                 .WaitAndRetryAsync(3, retryAttempt =>
                 {
                     if (retryAction is not null)
-                        retryAction(); 
-                    return TimeSpan.FromMilliseconds(DelayErrors); 
+                        retryAction();
+                    return TimeSpan.FromMilliseconds(DelayErrors);
                 },
-                (exception, timeSpan, context) =>
-                {
-                    //Console.WriteLine($"Retry after {timeSpan.Seconds} seconds due to: {exception.Message}");
-                    //TODO: Логирование?
-                });
+                (exception, timeSpan, context) => { });
 
             var response2 = await retryPolicy.ExecuteAsync(async () =>
             {
-
                 await Task.Delay(delayRequests);
                 var response = await sharedHttpClient.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
-                {
-                    //Console.WriteLine($"Failed to retrieve match data for {url}. HTTP Status: {response.StatusCode}");
-                    //TODO: Логирование?
-                    return default;
-                }
+                    throw new HttpRequestException();
+                    //return default;
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var deserializeResponse = JsonConvert.DeserializeObject<T>(responseBody);
 

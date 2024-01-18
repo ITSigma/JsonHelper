@@ -1,20 +1,16 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JsonHelper
+namespace JsonHelper.Infrastructure
 {
     internal class FileReader<T>
     {
-        private const int BufferSize = 8192;
         public static async Task<T> ReadFromFileAsync(string filePath, bool seekBegin = false)
         {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"There is no such file in {filePath}");
             T? deserializedValue;
             using (var stream = new FileStream(filePath, FileMode.Open,
-                    FileAccess.Read, FileShare.None, bufferSize: BufferSize, useAsync: true))
+                    FileAccess.Read, FileShare.None, bufferSize: Constants.BufferSize, useAsync: true))
             using (var reader = new StreamReader(stream))
             {
                 var fileContent = await reader.ReadToEndAsync();

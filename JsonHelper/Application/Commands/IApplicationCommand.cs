@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JsonHelper
+namespace JsonHelper.Application
 {
-    internal class Class1
+    internal interface IApplicationCommand<T>
     {
-        // объединить все классы 
+        public void Execute(T arg);
     }
 }
