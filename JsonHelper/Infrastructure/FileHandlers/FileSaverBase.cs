@@ -5,16 +5,12 @@ namespace JsonHelper.Infrastructure
 {
     internal static class DefaultFileWriter<T> 
     {
-        //TODO: Настроить Paths
         public static async Task SaveToFileAsync(T valueToSave, string directoryPath,
             string fileName, Func<T, T, T> joinExistAndNewValues = null)
         {
-            // directoryPath = Path.Combine(Directory.GetCurrentDirectory(), directoryPath);
-
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             var filePath = Path.Combine(directoryPath, fileName);
-            //var filePath = Path.Combine(Directory.GetCurrentDirectory(), directoryPath, fileName);
 
             if (joinExistAndNewValues is not null && File.Exists(filePath))
                 valueToSave = await GetJoinedValues(valueToSave, filePath,

@@ -1,4 +1,6 @@
-﻿namespace JsonHelper.Application
+﻿using Castle.Core.Internal;
+
+namespace JsonHelper.Application
 {
     internal class UrlCompiler : IUrlCompiler
     {
@@ -9,12 +11,14 @@
             BaseUrl = baseUrl;
         }
 
-        public string Compile(Dictionary<string, string> headerValues)
+        public string Compile(Dictionary<string, string> headerValues = null)
         {
+            if (headerValues.IsNullOrEmpty())
+                return BaseUrl;
             var headers = string.Join('&', headerValues
                 .Select(header => $"{header.Key}={header.Value}")
                 .ToArray());
-            return headers.Length > 0 ? $"{BaseUrl}?{headers}&" : BaseUrl;
+            return $"{BaseUrl}?{headers}";
         }
     }
 }

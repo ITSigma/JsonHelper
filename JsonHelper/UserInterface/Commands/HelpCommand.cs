@@ -1,5 +1,8 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace JsonHelper.UserInterface
 {
@@ -9,7 +12,7 @@ namespace JsonHelper.UserInterface
         private readonly TextWriter writer;
 
         public HelpCommand(Lazy<ICommandsExecutor> executor, TextWriter writer)
-            : base("h", "h      # prints available commands list", 0)
+            : base("help", "help <command>      # prints help for command", 1)
         {
             this.executor = executor;
             this.writer = writer;
@@ -17,11 +20,10 @@ namespace JsonHelper.UserInterface
 
         public override void Execute(string[] args)
         {
-            CheckArgumentsCount(writer, args);
-            var commands = executor.Value.GetAvailableCommandName();
-            writer.WriteLine("Available commands: " + string.Join(", ", commands));
-            foreach (var command in commands)
-                writer.WriteLine(executor.Value.FindCommandByName(command).Help);
+            if (!CheckArgumentsCount(writer, args))
+                return;
+            var command = args[0];
+            writer.WriteLine(executor.Value.FindCommandByName(command).Help);
         }
     }
 }

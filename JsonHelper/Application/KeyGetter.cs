@@ -1,45 +1,30 @@
 ﻿using JsonHelper.Domain;
 using JsonHelper.Infrastructure;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Castle.Core.Internal;
 
 namespace JsonHelper.Application
 {
-    internal static class KeyGetter<T>
-        where T: IKey
+    internal class KeyGetter
     {
-        private static int keyPointer { get; set; }
-        private static int maxKeyPointer => apiKeys.Count;
-        private static readonly List<T> apiKeys;
-        private static readonly object apiKeyLock = new();
+        private readonly Queue<string> apiKeys;
+        private readonly object apiKeyLock = new();
 
-        static KeyGetter()
+        public KeyGetter(string keyFilePath)
         {
-            var filePath = typeof(T)
-                .GetProperty("KeysFilePath", BindingFlags.Public 
-                    | BindingFlags.Static 
-                    | BindingFlags.FlattenHierarchy)?
-                .GetValue(null);
-            if (filePath is null)
-                throw new NullReferenceException($"KeysFilePath in {typeof(T).Name} is null.");
-            apiKeys = Task.Run(() => FileReader<List<T>>
-                .ReadFromFileAsync((string)filePath))
+            apiKeys = Task.Run(() => FileReader<Queue<string>>
+                .ReadFromFileAsync(keyFilePath))
                 .Result;
-            if (apiKeys.IsNullOrEmpty())
-                throw new NullReferenceException($"There is no any keys in {filePath}.");
+            if (apiKeys is null || apiKeys.Count == 0)
+                throw new NullReferenceException($"There is no any keys in {keyFilePath}.");
         }
 
-        public static string GetNextKey()
+        public string GetNextKey()
         {
             lock (apiKeyLock)
             {
-                var key = apiKeys[keyPointer];
-                keyPointer = keyPointer++ % maxKeyPointer;
-                return key.Key;
+                var key = apiKeys.Dequeue();
+                apiKeys.Enqueue(key);
+                return key;
             }
         }
     }
