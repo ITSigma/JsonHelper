@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JsonHelper.Infrastructure
+namespace JsonHelper
 {
     //internal class EnumerableFileSaver<T> : FileSaverBase<IEnumerable<T>>
     //{

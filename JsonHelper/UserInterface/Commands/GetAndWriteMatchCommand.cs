@@ -10,31 +10,40 @@ namespace JsonHelper.UserInterface
         private static UrlCompiler urlCompiler = new UrlCompiler(baseUrl);
         private TextWriter writer;
 
+        
         public GetAndWriteMatchCommand(TextWriter writer)
-            : base("match", "match <matchID, directoryPath>      # Get match and Save it to directory ")
+            : base("match", "match <matchID, directoryPath>      # Get match and Save it to directory ", 2)
         {
             this.writer = writer;
         }
 
         public override void Execute(string[] args)
         {
+            CheckArgumentsCount(writer, args);
             var matchID = args[0];
             var directoryPath = args[1];
 
             app = new GetAndWriteApplication<SteamAPIResult<Match>, Match>(directoryPath,
                 new DefaultFileNameBuilder<Match>(),
                 (getResult) => getResult.result);
-
-            writer.WriteLine($"Start saving {matchID}...");
             var url = urlCompiler
                 .Compile(new Dictionary<string, string>()
                 {
+                    ["key"] = KeyGetter<SteamKey>.GetNextKey(),
                     ["match_id"] = matchID,
-                });
-            //var url = $"https://api.opendota.com/api/matches/{matchID}&";
+                }); 
+            //var url = $"https://api.opendota.com/api/matches/{matchID}";
             //writer.WriteLine(url);
-            app.Execute(url);
-            writer.WriteLine($"Save {matchID}");
+            try
+            { 
+                app.Execute(url);
+            }
+            catch (Exception e)
+            {
+                writer.WriteLine($"Error!\nError message: {e.Message}");
+                return;
+            }
+            writer.WriteLine($"Ok! {matchID} has already written to {directoryPath}.");
         }
     }
 }

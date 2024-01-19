@@ -15,6 +15,6 @@
         public int human_players { get; set; }
 
         public override string ToString()
-            => match_id;
+            => match_id.ToString();
     }
 }

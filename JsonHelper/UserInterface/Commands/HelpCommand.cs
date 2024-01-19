@@ -9,7 +9,7 @@ namespace JsonHelper.UserInterface
         private readonly TextWriter writer;
 
         public HelpCommand(Lazy<ICommandsExecutor> executor, TextWriter writer)
-            : base("h", "h      # prints available commands list")
+            : base("h", "h      # prints available commands list", 0)
         {
             this.executor = executor;
             this.writer = writer;
@@ -17,7 +17,11 @@ namespace JsonHelper.UserInterface
 
         public override void Execute(string[] args)
         {
-            writer.WriteLine("Available commands: " + string.Join(", ", executor.Value.GetAvailableCommandName()));
+            CheckArgumentsCount(writer, args);
+            var commands = executor.Value.GetAvailableCommandName();
+            writer.WriteLine("Available commands: " + string.Join(", ", commands));
+            foreach (var command in commands)
+                writer.WriteLine(executor.Value.FindCommandByName(command).Help);
         }
     }
 }

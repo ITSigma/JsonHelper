@@ -41,8 +41,8 @@ namespace JsonHelper.Infrastructure
                 await Task.Delay(delayRequests);
                 var response = await sharedHttpClient.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
-                    throw new HttpRequestException();
-                    //return default;
+                    throw new HttpRequestException($"Response code from {url} is {response.StatusCode} with message {response.RequestMessage}."
+                        + $"\nCheck that args are correct.");
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var deserializeResponse = JsonConvert.DeserializeObject<T>(responseBody);
 

@@ -28,6 +28,8 @@ namespace JsonHelper.Application
         {
             var getValue = await requestHandler.GetRequestAsync<TGet>(url);
             var valueToWrite = getToWriteValueConverter(getValue);
+            if (valueToWrite is null)
+                throw new NullReferenceException($"Received from {url} value is null.");
             var filename = nameBuilder.BuildName(valueToWrite, "json");
             lock (lockObject)
             {
