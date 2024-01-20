@@ -13,8 +13,5 @@
         public IList<PickBan> picks_bans { get; set; }
         public IList<PlayerPicks> players { get; set; }
         public int human_players { get; set; }
-
-        public override string ToString()
-            => match_id.ToString();
     }
 }

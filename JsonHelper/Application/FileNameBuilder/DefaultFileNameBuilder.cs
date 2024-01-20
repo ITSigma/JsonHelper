@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace JsonHelper.Application
 {
-    internal class DefaultFileNameBuilder<T> : IFileNameBuilder<T>
+    internal class DefaultFileNameBuilder<T> : FileNameBuilderBase<T>
     {
-        public string BuildName(T value, string fileExtension)
-            => $"{typeof(T).Name}_{value}.{fileExtension}";
+        public DefaultFileNameBuilder(Func<T, string> valueToNameFunc, string label) 
+            : base(valueToNameFunc, label)
+        {
+        }
+
+        public override string BuildName(T value, string fileExtension)
+            => BuildNameDefault(value, fileExtension);
     }
 }
