@@ -18,12 +18,15 @@ namespace JsonHelper.UserInterface
             this.writer = writer;
         }
 
-        public override void Execute(string[] args)
+        public async override Task Execute(string[] args)
         {
-            if (!CheckArgumentsCount(writer, args))
-                return;
-            var command = args[0];
-            writer.WriteLine(executor.Value.FindCommandByName(command).Help);
+            CheckArgumentsCount(args);
+            var cmd = executor.Value.FindCommandByName(args[0]);
+            if (cmd == null)
+                throw new ArgumentException($"Sorry. Unknown command {args[0]}");
+            else
+                writer.WriteLine(cmd.Help);
+
         }
     }
 }

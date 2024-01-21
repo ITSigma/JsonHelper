@@ -1,29 +1,29 @@
-﻿namespace JsonHelper.UserInterface
+﻿using Castle.Core.Internal;
+
+namespace JsonHelper.UserInterface
 {
     public abstract class ConsoleCommand
     {
-        protected ConsoleCommand(string name, string help, int argsCount)
+        protected ConsoleCommand(string name, string help, params int[] availibleArgsCount)
         {
             Name = name;
             Help = help;
-            this.argsCount = argsCount;
+            if (availibleArgsCount.IsNullOrEmpty())
+                throw new ArgumentException("Please provide availible argumets count");
+            this.availibleArgsCount = new HashSet<int>(availibleArgsCount);
         }
 
         public string Name { get; }
         public string Help { get; }
-        protected int argsCount { get; }
+        protected HashSet<int> availibleArgsCount { get; }
 
-        public abstract void Execute(string[] args);
+        public abstract Task Execute(string[] args);
 
-        protected bool CheckArgumentsCount(TextWriter writer, string[] args)
+        protected void CheckArgumentsCount(string[] args)
         {
-            if (args.Length != argsCount)
-            {
-                writer.WriteLine("Error!");
-                writer.WriteLine($"Error message: except {argsCount} arguments but {args.Length} was given.");
-                return false;
-            }
-            return true;
+            if (!availibleArgsCount.Contains(args.Length))
+                throw new ArgumentException($"Except one of [ {string.Join(", ", availibleArgsCount)} ] " +
+                    $"argument's count but {args.Length} was given.");
         }
     }
 }

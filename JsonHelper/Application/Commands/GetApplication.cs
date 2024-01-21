@@ -24,10 +24,11 @@ namespace JsonHelper.Application
             urlCompiler = new UrlCompiler(baseUrl);
         }
 
-        public async Task<T> GetValueAsync(Dictionary<string, string> headers = null)
+        public async Task<T> GetValueAsync(Dictionary<string, string> headers = null,
+            Action retryAction = null)
         {
             var url = GetUrl(headers);
-            var getValue = await requestHandler.GetRequestAsync<T>(url);
+            var getValue = await requestHandler.GetRequestAsync<T>(url, retryAction);
             return getValue;
         }
 

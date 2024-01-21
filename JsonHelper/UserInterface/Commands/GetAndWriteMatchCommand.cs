@@ -5,14 +5,12 @@ namespace JsonHelper.UserInterface
 {
     public class GetAndWriteMatchCommand : ConsoleCommand
     {
-        private GetAndWriteApplication<SteamAPIResult<Match>, Match> app;
         private static string baseUrl = "http://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1";
         private TextWriter writer;
 
-        
         public GetAndWriteMatchCommand(TextWriter writer)
             : base("match", "match <matchID, directoryPath, keyPath>      "
-                  + "# Get match by match ID and Save it to directory."
+                  + "# Get match by match ID and save it to directory."
                   + "\n- match : ID of dota match "
                   + "\n- directoryPath : path to directory to save match "
                   + "\n- keyPath : path to file with steam keys ", 3)
@@ -20,38 +18,34 @@ namespace JsonHelper.UserInterface
             this.writer = writer;
         }
 
-        public override void Execute(string[] args)
+        public async override Task Execute(string[] args)
         {
-            if (!CheckArgumentsCount(writer, args))
-                return;
+            var (matchID, directoryPath, keyPath) = GetArgs(args);
+            await HandleArgsAsync(matchID, directoryPath, keyPath);
+        }
+
+
+        private async Task HandleArgsAsync(string matchID, string directoryPath, string keyPath)
+        {
+            writer.WriteLine($"Try get and write {matchID}.");
+            var getter = new GetApplication<SteamAPIResult<Match>>(baseUrl,
+                new KeyGetter(keyPath), 0);
+            var matchWriter = new WriteApplication<Match>(directoryPath,
+                new DefaultFileNameBuilder<Match>(match => match.match_id.ToString(), "Match"));
+            var getValue = await getter.GetValueAsync(new Dictionary<string, string>() { ["match_id"] = matchID });
+            await matchWriter.WriteValueAsync(getValue.result);
+            writer.WriteLine($"Ok! {matchID} has already written to {directoryPath}.");
+        }
+
+        private (string, string, string) GetArgs(string[] args)
+        {
+            CheckArgumentsCount(args);
             var matchID = args[0];
             var directoryPath = args[1];
             var keyPath = args[2];
             if (!long.TryParse(matchID, out var parseResult))
-            {
-                writer.WriteLine($"Your match ID {matchID} is wrong. Check that value is long int.");
-                return;
-            }
-            HandleArgs(matchID, directoryPath, keyPath);
-        }
-
-        private void HandleArgs(string matchID, string directoryPath, string keyPath)
-        {
-            try
-            {
-                app = new GetAndWriteApplication<SteamAPIResult<Match>, Match>(directoryPath,
-                   new DefaultFileNameBuilder<Match>(),
-                   (getResult) => getResult.result,
-                   baseUrl, new KeyGetter(keyPath), 0);
-                writer.WriteLine($"Try get ang write match with id {matchID}.");
-                app.Execute(new Dictionary<string, string>() { ["match_id"] = matchID });
-            }
-            catch (Exception e)
-            {
-                writer.WriteLine($"Error!\nError message: {e.Message}");
-                return;
-            }
-            writer.WriteLine($"\rOk! {matchID} has already written to {directoryPath}.");
+                throw new ArgumentException($"Provided match ID {matchID} is wrong. Check that value is long int.");
+            return (matchID, directoryPath, keyPath);
         }
     }
 }

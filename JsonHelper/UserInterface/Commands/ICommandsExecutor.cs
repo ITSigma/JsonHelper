@@ -4,6 +4,6 @@
     {
         ConsoleCommand FindCommandByName(string name);
         string[] GetAvailableCommandName();
-        void Execute(string[] args);
+        Task Execute(string[] args);
     }
 }

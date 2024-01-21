@@ -15,10 +15,9 @@ namespace JsonHelper.UserInterface
             this.writer = writer;
         }
 
-        public override void Execute(string[] args)
+        public async override Task Execute(string[] args)
         {
-            if (!CheckArgumentsCount(writer, args))
-                return;
+            CheckArgumentsCount(args);
             var commands = executor.Value.GetAvailableCommandName();
             writer.WriteLine("Available commands: " + string.Join(", ", commands));
         }

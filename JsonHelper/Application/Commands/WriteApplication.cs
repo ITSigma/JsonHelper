@@ -22,7 +22,7 @@ namespace JsonHelper.Application
             this.nameBuilder = nameBuilder;
         }
 
-        public async void WriteValueAsync(T value)
+        public async Task WriteValueAsync(T value)
         {
             var filename = nameBuilder.BuildName(value, "json");
             await matchesSemaphore.WaitAsync();

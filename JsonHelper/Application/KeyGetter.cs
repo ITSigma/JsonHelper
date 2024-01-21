@@ -6,6 +6,7 @@ namespace JsonHelper.Application
 {
     internal class KeyGetter
     {
+        public int Count => apiKeys.Count;
         private readonly Queue<string> apiKeys;
         private readonly object apiKeyLock = new();
 

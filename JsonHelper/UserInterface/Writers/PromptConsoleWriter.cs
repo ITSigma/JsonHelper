@@ -12,9 +12,9 @@ namespace JsonHelper.UserInterface
             ChangeConsoleColor(() => Console.Out.WriteLine(s));
         }
 
-        public override void Write(string s)
+        public async override Task WriteLineAsync(string s)
         {
-            ChangeConsoleColor(() => Console.Out.Write(s));
+            ChangeConsoleColor(() => Console.Out.WriteLineAsync(s));
         }
 
         private void ChangeConsoleColor(Action consoleAction)

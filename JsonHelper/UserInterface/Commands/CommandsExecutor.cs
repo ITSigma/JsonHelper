@@ -1,4 +1,8 @@
-﻿namespace JsonHelper.UserInterface
+﻿using Castle.Core.Internal;
+using System;
+using System.IO;
+
+namespace JsonHelper.UserInterface
 {
     public class CommandsExecutor : ICommandsExecutor
     {
@@ -12,18 +16,16 @@
         }
 
         public string[] GetAvailableCommandName()
-        {
-            return commands.Select(c => c.Name).ToArray();
-        }
-        
+            => commands
+                .Select(c => c.Name)
+                .ToArray();
+
         public ConsoleCommand FindCommandByName(string name)
-        {
-            return commands
+            => commands
                 .FirstOrDefault(c => string
                 .Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
-        }
 
-        public void Execute(string[] args)
+        public async Task Execute(string[] args)
         {
             if (args[0].Length == 0)
             {
@@ -36,7 +38,26 @@
             if (cmd == null)
                 writer.WriteLine("Sorry. Unknown command {0}", commandName);
             else
-                cmd.Execute(args.Skip(1).ToArray());
+            {
+                try
+                {
+                    await cmd.Execute(args
+                    .Skip(1)
+                    .Where(arg => !arg.IsNullOrEmpty())
+                    .ToArray());
+                }
+                catch (Exception e)
+                {
+                    if (!e.Message.IsNullOrEmpty())
+                        WriteLineError(e.Message);
+                }
+            }
+        }
+
+        private void WriteLineError(string errorMessage)
+        {
+            writer.WriteLine("Error!");
+            writer.WriteLine($"Error message: {errorMessage}");
         }
     }
 }
